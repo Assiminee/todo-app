@@ -28,6 +28,7 @@ import com.toDoList.model.Gender;
 import com.toDoList.model.User;
 import com.toDoList.repository.UserRepository;
 import com.toDoList.service.CustomerUserServiceImplementation;
+import com.toDoList.service.UserService;
 
 
 
@@ -42,15 +43,18 @@ public class AuthController {
 	
 	private PasswordEncoder passwordEncoder;
 	
+	private UserService userService;
+	
 	private CustomerUserServiceImplementation customUserDetails;
 	
 	@Autowired
 	public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
-			CustomerUserServiceImplementation customUserDetails) {
+			CustomerUserServiceImplementation customUserDetails, UserService userService) {
 		super();
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.customUserDetails = customUserDetails;
+		this.userService = userService;
 	}
 
 
@@ -61,9 +65,9 @@ public class AuthController {
 			  @RequestParam("userName") String fullName
 			, @RequestParam("email") String email
 			, @RequestParam("password") String password
-			, @RequestParam("gender") String gender
-			, @RequestParam("profilePicture") String profilePicture
-			, @RequestParam("birthDate") Date birthDate ) throws Exception{
+			, @RequestParam("gender") String gender 
+			, @RequestParam("birthDate") Date birthDate
+			, @RequestParam("picture") MultipartFile profilePicture) throws Exception{
 		
 		
 		
@@ -87,10 +91,11 @@ public class AuthController {
     	newUser.setBirthDate(birthDate);
     	newUser.setEmail(email);
     	newUser.setUserName(fullName);
-    	newUser.setProfilePicture(profilePicture);
     	newUser.setPassword(passwordEncoder.encode(password));
     	
-    	userRepository.save(newUser);
+    	
+    	userService.insertUser(newUser, profilePicture);
+    	
     	
     	
     	Authentication authentication = new UsernamePasswordAuthenticationToken(email , password);
