@@ -67,7 +67,7 @@ public class AuthController {
 			, @RequestParam("password") String password
 			, @RequestParam("gender") String gender 
 			, @RequestParam("birthDate") Date birthDate
-			, @RequestParam("picture") MultipartFile profilePicture) throws Exception{
+			, @RequestParam("profilePicture") MultipartFile profilePicture) throws Exception{
 		
 		
 		
@@ -103,6 +103,7 @@ public class AuthController {
     	
     	String token = JwtProvider.generateToken(authentication);
     	
+    	
     	AuthResponse authResponse = new AuthResponse();
     	authResponse.setJwt(token);
     	authResponse.setMessage("Registered Successfully");
@@ -132,7 +133,7 @@ public class AuthController {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 
 				String token = JwtProvider.generateToken(authentication);
-
+				
 				authResponse.setMessage("Login Successful");
 				authResponse.setJwt(token);
 				authResponse.setStatus(true);
@@ -146,7 +147,7 @@ public class AuthController {
 				authResponse.setJwt(null);
 				authResponse.setStatus(false);
 				
-				return new ResponseEntity<>(authResponse , HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<>(authResponse , HttpStatus.NOT_FOUND);
 			}
 	    	
 	    	

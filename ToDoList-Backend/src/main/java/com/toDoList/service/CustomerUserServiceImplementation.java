@@ -27,7 +27,7 @@ public class CustomerUserServiceImplementation implements UserDetailsService {
 		User user = userRepository.findByEmail(username);
 
 		if (user == null) {
-			throw new UsernameNotFoundException("user not found with email" + username);
+			throw new UsernameNotFoundException("user not found with email " + username);
 		}
 		
 		List<GrantedAuthority> authorities = new ArrayList<>();

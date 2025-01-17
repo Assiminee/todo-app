@@ -1,6 +1,5 @@
 package com.toDoList.service;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,5 +69,68 @@ public class UserServiceImpl implements UserService {
 
 		}
 	}
+
+
+	@Override
+	public void deleteUser(User user) throws Exception {
+		
+		userRepository.delete(user);
+		
+	}
+
+
+	@Override
+	public User updateUser(User existingUser, User updatedUser, MultipartFile profilePicture) throws Exception {
+	
+		
+		if(updatedUser.getUserName() != null ) {
+			existingUser.setUserName(updatedUser.getUserName());
+		}
+		if(updatedUser.getEmail() != null ) {
+			existingUser.setEmail(updatedUser.getEmail());
+		}
+		if(updatedUser.getBirthDate() != null ) {
+			existingUser.setBirthDate(updatedUser.getBirthDate());
+		}
+		if(updatedUser.getPassword() != null ) {
+			existingUser.setPassword(updatedUser.getPassword());
+		}
+		if(updatedUser.getGender() != null ) {
+			existingUser.setGender(updatedUser.getGender());
+		}
+		
+		
+		
+		if(profilePicture !=null) {
+			
+			Path uploadPath = Paths.get(uploadDir);
+
+			if (!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+
+			String originalFileName = profilePicture.getOriginalFilename();
+
+			if (originalFileName != null && !originalFileName.isEmpty()) {
+				String fileExtension = "";
+				int dotIndex = originalFileName.lastIndexOf(".");
+				if (dotIndex != -1) {
+					fileExtension = originalFileName.substring(dotIndex);
+				}
+				String uniqueFileName = originalFileName.replace(fileExtension, "") + "_" + Instant.now().toEpochMilli()
+						+ fileExtension;
+				Path filePath = uploadPath.resolve(uniqueFileName);
+				profilePicture.transferTo(filePath.toFile());
+				
+				existingUser.setProfilePicture(uniqueFileName);
+				
+			}
+		}
+		
+		
+		return userRepository.save(existingUser);
+	}
+	
+	
 
 }

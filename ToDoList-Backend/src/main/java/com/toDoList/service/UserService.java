@@ -17,5 +17,11 @@ public interface UserService {
 	
 	public void insertUser(User newUser, MultipartFile profilePicture) throws Exception;
 	
+	public User updateUser(User existingUser, User updatedUser, MultipartFile profilePicture) throws Exception;
+	
+	public void deleteUser(User user) throws Exception;
+	
+	
+	
 
 }
