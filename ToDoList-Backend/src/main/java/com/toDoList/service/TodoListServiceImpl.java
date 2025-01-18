@@ -44,4 +44,28 @@ public class TodoListServiceImpl implements TodoListService {
 		todoList.setMembers(List.of(ownerMember));
 		return todoListRepository.save(todoList);
 	}
+	
+	
+    public List<TodoList> getTodoListsOwnedByUser(String jwt) {
+    	
+        User loggedInUser = userService.getProfile(jwt);
+        
+        return todoListRepository.findAllByOwner(loggedInUser);
+    }
+
+	@Override
+	public List<TodoList> getTodoListsWhereUserIsMember(String jwt) {
+		
+		User loggedInUser = userService.getProfile(jwt);
+		
+		 return memberRepository.findAllTodoListsByMemberId(loggedInUser.getId());
+	}
+
+	@Override
+	public List<TodoList> getTodoListsOwnedAndMemberByUser(String jwt) {
+		
+		User loggedInUser = userService.getProfile(jwt);
+		
+		return todoListRepository.findAllByOwnerAndMember(loggedInUser.getId());
+	}
 }

@@ -30,7 +30,7 @@ public class AppConfig {
 		   
 		  http.sessionManagement(
 				  management->management.sessionCreationPolicy(
-						 SessionCreationPolicy.STATELESS 
+						 SessionCreationPolicy.STATELESS
 						 )
 				  ).authorizeHttpRequests(
 						  Authorize->Authorize.requestMatchers("/api/**").authenticated().anyRequest().permitAll()
@@ -57,7 +57,7 @@ public class AppConfig {
 				// TODO Auto-generated method stub
 				CorsConfiguration cfg = new CorsConfiguration();
 				cfg.setAllowedOrigins(Arrays.asList(
-						"http://localhost:3000"
+						"http://localhost:8080"
 						));
 				cfg.setAllowedMethods(Collections.singletonList("*"));
 				cfg.setAllowCredentials(true);

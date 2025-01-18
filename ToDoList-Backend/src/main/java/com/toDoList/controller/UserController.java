@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.toDoList.model.Gender;
 import com.toDoList.model.User;
+import com.toDoList.repository.UserRepository;
 import com.toDoList.service.UserService;
 
 
@@ -34,13 +35,17 @@ public class UserController {
 	
     private PasswordEncoder passwordEncoder;
     
+   
+	private UserRepository userRepository;
+    
     
 	
     @Autowired
-	public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+	public UserController(UserService userService, PasswordEncoder passwordEncoder,UserRepository userRepository) {
 		super();
 		this.userService = userService;
 		this.passwordEncoder = passwordEncoder;
+		this.userRepository = userRepository;
 	}
 
 
@@ -84,7 +89,16 @@ public class UserController {
 			, @RequestParam("birthDate") Date birthDate
 			, @RequestParam("profilePicture") MultipartFile profilePicture) throws Exception{
 	
-		User loggedUser = userService.getProfile(jwt);
+		
+		
+        User isEmailExist = userRepository.findByEmail(email);
+    	
+    	if(isEmailExist != null) {
+    		
+    		throw new Exception("Email est déja utilisé par un autre compte");
+    	}
+    	
+    	User loggedUser = userService.getProfile(jwt);
 		
 		User updatedUser = new User();
 		
