@@ -1,9 +1,7 @@
 package com.toDoList.model;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +17,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
 public class User {
 	

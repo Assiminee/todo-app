@@ -32,8 +32,9 @@ public class AppConfig {
 				  management->management.sessionCreationPolicy(
 						 SessionCreationPolicy.STATELESS 
 						 )
-				  ).authorizeHttpRequests(
-						  Authorize->Authorize.requestMatchers("/api/**").authenticated().anyRequest().permitAll()
+				  ).authorizeHttpRequests(Authorize ->
+						  Authorize.requestMatchers("/images/**").permitAll()
+								  .requestMatchers("/api/**").authenticated().anyRequest().permitAll()
 				  ).addFilterBefore(new JwtTokenValidator() , BasicAuthenticationFilter.class)
 		                        .csrf(csrf->csrf.disable())
 		                        .cors(cors->cors.configurationSource(corsConfigurationSource()))
