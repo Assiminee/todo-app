@@ -31,7 +31,7 @@ public class Member {
 
 	    private LocalDateTime addedAt = LocalDateTime.now();
 	    private String privileges; // Use "ALL" for admin-level access
-	    private String role;       // Use "ADMIN" for owner
+	    private String role;       // Use "MEMBER_ADMIN" for owner
 
 	    @ManyToOne
 	    @JoinColumn(name = "list_id", nullable = false)

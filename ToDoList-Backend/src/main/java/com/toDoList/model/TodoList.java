@@ -33,7 +33,7 @@ public class TodoList {
 	private String title;
 	private String description;
 	private LocalDateTime createdAt = LocalDateTime.now();
-	private LocalDateTime updatedAt = LocalDateTime.now();
+	private LocalDateTime updatedAt;
 
 	private String category;
 
