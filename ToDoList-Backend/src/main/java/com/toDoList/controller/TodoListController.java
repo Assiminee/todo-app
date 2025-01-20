@@ -31,7 +31,7 @@ public class TodoListController {
 	}
 	
 	
-	@PostMapping("/createTodoList")
+	@PostMapping
 	public ResponseEntity<TodoList> createTodoList(@RequestHeader("Authorization") String jwt,
 			                                       @RequestParam("title") String title, 
 			                                       @RequestParam("description") String description,
@@ -59,7 +59,7 @@ public class TodoListController {
     	
         List<TodoList> todoLists = todoListService.getTodoListsWhereUserIsMember(jwt);
         
-        return ResponseEntity.ok(todoLists);
+        return new ResponseEntity<>(todoLists , HttpStatus.OK);
     }
 
     // Get all TodoLists where the user is both an owner and a member
@@ -68,7 +68,7 @@ public class TodoListController {
     	
         List<TodoList> todoLists = todoListService.getTodoListsOwnedAndMemberByUser(jwt);
         
-        return ResponseEntity.ok(todoLists);
+        return new ResponseEntity<>(todoLists , HttpStatus.OK);
     }
 	
 	
