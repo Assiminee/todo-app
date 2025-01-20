@@ -14,7 +14,7 @@ import com.toDoList.model.TodoList;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, UUID> {
 	
-	   @Query("SELECT m.list FROM Member m WHERE m.user.id = :userId AND m.role = 'MEMBER_USER' ")
-	    List<TodoList> findAllTodoListsByMemberId(@Param("userId") UUID userId);
+	//   @Query("SELECT m.list FROM Member m WHERE m.user.id = :userId AND m.role = 'MEMBER_USER' ")
+	  //  List<TodoList> findAllTodoListsByMemberId(@Param("userId") UUID userId);
 
 }

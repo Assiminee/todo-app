@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -29,9 +30,9 @@ public class Member {
 	    @GeneratedValue
 	    private UUID id;
 
+	    @CreationTimestamp
 	    private LocalDateTime addedAt = LocalDateTime.now();
-	    private String privileges; // Use "ALL" for admin-level access
-	    private String role;       // Use "MEMBER_ADMIN" for owner
+	    private String role;       // Use "OWNER" for owner or "MEMBER" for member
 
 	    @ManyToOne
 	    @JoinColumn(name = "list_id", nullable = false)
@@ -42,10 +43,9 @@ public class Member {
 	    @JoinColumn(name = "user_id", nullable = false)
 	    private User user;
 
-	    public Member(TodoList list, User user, String privileges, String role) {
+	    public Member(TodoList list, User user ,String role) {
 	        this.list = list;
 	        this.user = user;
-	        this.privileges = privileges;
 	        this.role = role;
 	    }
 

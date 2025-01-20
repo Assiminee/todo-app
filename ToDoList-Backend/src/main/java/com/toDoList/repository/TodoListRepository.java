@@ -14,18 +14,23 @@ import com.toDoList.model.User;
 
 @Repository
 public interface TodoListRepository extends JpaRepository<TodoList, UUID> {
-	
-	public List<TodoList> findAllByCategory (String category);
-	
-	public List<TodoList> findAllByOwner (User owner);
-	
-	 @Query("""
-	           SELECT t FROM TodoList t
-	           JOIN Member m ON t.id = m.list.id
-	           WHERE t.owner.id = :userId AND m.user.id = :userId
-	           """)
-	    List<TodoList> findAllByOwnerAndMember(@Param("userId") UUID userId);
-	
-	
+
+	@Query("""
+       SELECT t FROM TodoList t
+       JOIN Member m ON t.id = m.list.id
+       WHERE m.user.id = :userId
+       AND (:role = '' OR m.role = :role)
+       AND (:category = '' OR t.category = :category)
+       AND (:title = '' OR t.title LIKE CONCAT('%', :title, '%'))
+       """)
+	List<TodoList> filterTodoLists(
+			@Param("userId") UUID userId,
+			@Param("title") String title,
+			@Param("category") String category,
+			@Param("role") String role
+	);
+
+
+
 
 }

@@ -1,4 +1,4 @@
-package com.toDoList.Response;
+package com.toDoList.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-	private String jwt;
+
+public class TodoListDTO {
+
+    private String title;
+    private String description;
+    private String category;
 }

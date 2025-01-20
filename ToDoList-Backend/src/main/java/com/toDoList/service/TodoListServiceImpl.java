@@ -2,12 +2,13 @@ package com.toDoList.service;
 
 import java.util.List;
 
+import com.toDoList.model.*;
+import com.toDoList.model.dto.TodoListDTO;
+import com.toDoList.model.enums.Category;
+import com.toDoList.model.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.toDoList.model.Member;
-import com.toDoList.model.TodoList;
-import com.toDoList.model.User;
 import com.toDoList.repository.MemberRepository;
 import com.toDoList.repository.TodoListRepository;
 
@@ -30,42 +31,35 @@ public class TodoListServiceImpl implements TodoListService {
 	}
 
 	@Override
-	public TodoList createTodoList(String jwt, String title, String description, String category) {
+	public TodoList createTodoList(String jwt, TodoListDTO todoListDTO) throws Exception {
 		
 		User loggedInUser = userService.getProfile(jwt);
 
-		
-		TodoList todoList = new TodoList(title, description, category, loggedInUser);
+		String title = todoListDTO.getTitle();
+		String category = todoListDTO.getCategory();
+		String description = todoListDTO.getDescription();
+
+		TodoList todoList = new TodoList(title, description, Category.valueOf(category).name(), loggedInUser);
 
 		
-		Member ownerMember = new Member(todoList, loggedInUser, "ALL", "MEMBER_ADMIN");
+		Member ownerMember = new Member(todoList, loggedInUser,Role.OWNER.name());
 
 		// Save the TodoList (Cascade will save Members too)
 		todoList.setMembers(List.of(ownerMember));
 		return todoListRepository.save(todoList);
 	}
-	
-	
-    public List<TodoList> getTodoListsOwnedByUser(String jwt) {
-    	
-        User loggedInUser = userService.getProfile(jwt);
-        
-        return todoListRepository.findAllByOwner(loggedInUser);
-    }
 
-	@Override
-	public List<TodoList> getTodoListsWhereUserIsMember(String jwt) {
-		
-		User loggedInUser = userService.getProfile(jwt);
-		
-		 return memberRepository.findAllTodoListsByMemberId(loggedInUser.getId());
-	}
 
-	@Override
-	public List<TodoList> getTodoListsOwnedAndMemberByUser(String jwt) {
-		
+	public List<TodoList> getFilteredTodoLists(String jwt, String title, String category, String role) {
+		// Get logged-in user's profile
 		User loggedInUser = userService.getProfile(jwt);
-		
-		return todoListRepository.findAllByOwnerAndMember(loggedInUser.getId());
+
+		// Pass filters to the repository
+		return todoListRepository.filterTodoLists(
+				loggedInUser.getId(),
+				title == null ? "" : title,
+				category == null ? "" : category,
+				role == null ? "" : role
+		);
 	}
 }

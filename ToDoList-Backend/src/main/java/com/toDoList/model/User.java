@@ -2,6 +2,8 @@ package com.toDoList.model;
 
 import java.util.Date;
 import java.util.UUID;
+
+import com.toDoList.model.enums.Gender;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

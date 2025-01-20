@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-	private final String uploadDir = System.getProperty("user.dir") + "/uploads";
+	private final String uploadDir = System.getProperty("user.dir") + "/ToDoList-Backend/src/main/resources/static/images";
 
 	
 	

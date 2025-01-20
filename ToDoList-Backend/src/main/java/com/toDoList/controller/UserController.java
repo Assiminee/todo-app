@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.toDoList.model.Gender;
+import com.toDoList.model.enums.Gender;
 import com.toDoList.model.User;
 import com.toDoList.repository.UserRepository;
 import com.toDoList.service.UserService;
@@ -60,10 +60,8 @@ public class UserController {
 	
 	@GetMapping("/profile")
 	public ResponseEntity<User> getUserProfile (@RequestHeader("Authorization") String jwt){
-		
-		
+
 		User user = userService.getProfile(jwt);
-	//	System.out.println(user);
 		
 		return new ResponseEntity<>(user , HttpStatus.OK);
 	}
@@ -87,50 +85,65 @@ public class UserController {
 			, @RequestParam("password") String password
 			, @RequestParam("gender") String gender 
 			, @RequestParam("birthDate") Date birthDate
-			, @RequestParam("profilePicture") MultipartFile profilePicture) throws Exception{
+			, @RequestParam("profilePicture") MultipartFile profilePicture) throws Exception
+	{
 	
-		
-		
-        User isEmailExist = userRepository.findByEmail(email);
-    	
-    	if(isEmailExist != null) {
-    		
-    		throw new Exception("Email est déja utilisé par un autre compte");
-    	}
-    	
-    	User loggedUser = userService.getProfile(jwt);
-		
-		User updatedUser = new User();
-		
-		if(gender.equals("Male")) {
-			updatedUser.setGender(Gender.Male);
-    	}else {
-    		updatedUser.setGender(Gender.Female);
-    	}
-    	
-		updatedUser.setBirthDate(birthDate);
-		updatedUser.setEmail(email);
-		updatedUser.setUserName(fullName);
-		updatedUser.setPassword(passwordEncoder.encode(password));
-		
-		User user = userService.updateUser(loggedUser, updatedUser, profilePicture);
-		
-		
-		return new ResponseEntity<>(user,HttpStatus.OK);
+		try {
+
+
+			User isEmailExist = userRepository.findByEmail(email);
+
+			if (isEmailExist != null) {
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
+			}
+
+			User loggedUser = userService.getProfile(jwt);
+
+			User updatedUser = new User();
+
+			try {
+				updatedUser.setGender(Gender.valueOf(gender));
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+
+
+			updatedUser.setBirthDate(birthDate);
+			updatedUser.setEmail(email);
+			updatedUser.setUserName(fullName);
+			updatedUser.setPassword(passwordEncoder.encode(password));
+
+			User user = userService.updateUser(loggedUser, updatedUser, profilePicture);
+
+
+			return new ResponseEntity<>(user, HttpStatus.OK);
+
+		} catch (Exception e) {
+			e.getStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	
 
 		
 	@DeleteMapping
-	public ResponseEntity<String> deleteLoggedInUser (@RequestHeader("Authorization") String jwt) throws Exception{
-	
-		User user = userService.getProfile(jwt);
+	public ResponseEntity<Void> deleteLoggedInUser (@RequestHeader("Authorization") String jwt) throws Exception{
+
+		try {
+
+			User user = userService.getProfile(jwt);
+
+			userService.deleteUser(user);
+
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+		} catch (Exception e) {
+			e.getStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		
-		userService.deleteUser(user);
-		
-		
-		return new ResponseEntity<>("User deleted successfully",HttpStatus.NO_CONTENT);
+
 	}
 	
 	

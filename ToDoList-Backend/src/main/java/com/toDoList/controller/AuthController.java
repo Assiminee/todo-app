@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.toDoList.Request.LoginRequest;
 import com.toDoList.Response.AuthResponse;
 import com.toDoList.config.JwtProvider;
-import com.toDoList.model.Gender;
+import com.toDoList.model.enums.Gender;
 import com.toDoList.model.User;
 import com.toDoList.repository.UserRepository;
 import com.toDoList.service.CustomerUserServiceImplementation;
@@ -61,63 +61,62 @@ public class AuthController {
 
 	
 	@PostMapping("/signup")
-	public ResponseEntity<AuthResponse> createUserHandler(
-			  @RequestParam("userName") String fullName
+	public ResponseEntity<?> createUserHandler(
+			  @RequestParam("username") String fullName
 			, @RequestParam("email") String email
 			, @RequestParam("password") String password
 			, @RequestParam("gender") String gender 
-			, @RequestParam("birthDate") Date birthDate
-			, @RequestParam("profilePicture") MultipartFile profilePicture) throws Exception{
-		
-		
-		
-    	User isEmailExist = userRepository.findByEmail(email);
-    	
-    	if(isEmailExist != null) {
-    		
-    		throw new Exception("Email est déja utilisé par un autre compte");
-    	}
-    	
-    	//create new User
-    	
-    	User newUser = new User();
-    	
-    	if(gender.equals("Male")) {
-    		newUser.setGender(Gender.Male);
-    	}else {
-    		newUser.setGender(Gender.Female);
-    	}
-    	
-    	newUser.setBirthDate(birthDate);
-    	newUser.setEmail(email);
-    	newUser.setUserName(fullName);
-    	newUser.setPassword(passwordEncoder.encode(password));
-    	
-    	
-    	userService.insertUser(newUser, profilePicture);
-    	
-    	
-    	
-    	Authentication authentication = new UsernamePasswordAuthenticationToken(email , password);
-    	SecurityContextHolder.getContext().setAuthentication(authentication);
-    	
-    	String token = JwtProvider.generateToken(authentication);
-    	
-    	
-    	AuthResponse authResponse = new AuthResponse();
-    	authResponse.setJwt(token);
-    	authResponse.setMessage("Registered Successfully");
-    	authResponse.setStatus(true);
-    	
-    	return new ResponseEntity<>(authResponse , HttpStatus.CREATED);
-    	
+			, @RequestParam("birthdate") Date birthDate
+			, @RequestParam("profilePicture") MultipartFile profilePicture
+	) throws Exception
+	{
+		try {
+
+			User isEmailExist = userRepository.findByEmail(email);
+
+			if(isEmailExist != null)
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+			//create new User
+
+			User newUser = new User();
+
+			try {
+				newUser.setGender(Gender.valueOf(gender));
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+
+			newUser.setBirthDate(birthDate);
+			newUser.setEmail(email);
+			newUser.setUserName(fullName);
+			newUser.setPassword(passwordEncoder.encode(password));
+
+			userService.insertUser(newUser, profilePicture);
+
+			Authentication authentication = new UsernamePasswordAuthenticationToken(email , password);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			String token = JwtProvider.generateToken(authentication);
+
+
+			AuthResponse authResponse = new AuthResponse();
+			authResponse.setJwt(token);
+
+			return new ResponseEntity<>(authResponse , HttpStatus.CREATED);
+
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	
 	
 	
 	 @PostMapping("/login")
-	    public ResponseEntity<AuthResponse> signin (@RequestBody LoginRequest loginRequest){
+	    public ResponseEntity<?> login (@RequestBody LoginRequest loginRequest) {
 	    	
 			AuthResponse authResponse = new AuthResponse();
 			
@@ -134,20 +133,14 @@ public class AuthController {
 
 				String token = JwtProvider.generateToken(authentication);
 				
-				authResponse.setMessage("Login Successful");
 				authResponse.setJwt(token);
-				authResponse.setStatus(true);
-				
+
 				return new ResponseEntity<>(authResponse , HttpStatus.OK);
 				
 			} catch (Exception e) {
-				
 				e.printStackTrace();
-				authResponse.setMessage(e.getMessage());
-				authResponse.setJwt(null);
-				authResponse.setStatus(false);
-				
-				return new ResponseEntity<>(authResponse , HttpStatus.NOT_FOUND);
+
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
 	    	
 	    	

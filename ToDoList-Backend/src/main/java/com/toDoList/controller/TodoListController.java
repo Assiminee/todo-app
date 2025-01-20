@@ -2,6 +2,7 @@ package com.toDoList.controller;
 
 import java.util.List;
 
+import com.toDoList.model.dto.TodoListDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,55 +21,41 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 
 @RestController
-@RequestMapping("/api/todoList")
+@RequestMapping("/api/todoLists")
 public class TodoListController {
 	
-	private TodoListService todoListService;
+	private final TodoListService todoListService;
 
 	@Autowired
 	public TodoListController(TodoListService todoListService) {
-		this.todoListService = todoListService;
+        this.todoListService = todoListService;
 	}
 	
 	
 	@PostMapping
-	public ResponseEntity<TodoList> createTodoList(@RequestHeader("Authorization") String jwt,
-			                                       @RequestParam("title") String title, 
-			                                       @RequestParam("description") String description,
-			                                       @RequestParam("category") String category) {
-		
-		
-		TodoList todoList =  todoListService.createTodoList(jwt, title, description, category);
-		
-		return new ResponseEntity<>(todoList , HttpStatus.CREATED);
-	}
-	
-	
-	 //get all todolists that i own
-    @GetMapping("/owned")
-    public ResponseEntity<List<TodoList>> getOwnedTodoLists(@RequestHeader("Authorization") String jwt) {
-    	
-        List<TodoList> todoLists = todoListService.getTodoListsOwnedByUser(jwt);
-        
-        return new ResponseEntity<>(todoLists , HttpStatus.OK);
-    }
-    
-    // Get all TodoLists where the user is a regular member
-    @GetMapping("/member")
-    public ResponseEntity<List<TodoList>> getTodoListsWhereUserIsMember(@RequestHeader("Authorization") String jwt) {
-    	
-        List<TodoList> todoLists = todoListService.getTodoListsWhereUserIsMember(jwt);
-        
-        return new ResponseEntity<>(todoLists , HttpStatus.OK);
-    }
+	public ResponseEntity<TodoList> createTodoList(
+            @RequestHeader("Authorization") String jwt,
+            @RequestBody TodoListDTO todoListDTO
+            ) {
 
-    // Get all TodoLists where the user is both an owner and a member
-    @GetMapping("/owned-and-member")
-    public ResponseEntity<List<TodoList>> getTodoListsOwnedAndMemberByUser(@RequestHeader("Authorization") String jwt) {
-    	
-        List<TodoList> todoLists = todoListService.getTodoListsOwnedAndMemberByUser(jwt);
-        
-        return new ResponseEntity<>(todoLists , HttpStatus.OK);
+        try {
+            TodoList todoList = todoListService.createTodoList(jwt, todoListDTO);
+            return new ResponseEntity<>(todoList , HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+	}
+
+
+    @GetMapping
+    public ResponseEntity<List<TodoList>> getFilteredTodoLists(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false,defaultValue = "") String title,
+            @RequestParam(required = false,defaultValue = "") String category,
+            @RequestParam(required = false,defaultValue = "") String role
+    ) {
+        List<TodoList> todoLists = todoListService.getFilteredTodoLists(jwt, title, category, role);
+        return ResponseEntity.ok(todoLists);
     }
 	
 	

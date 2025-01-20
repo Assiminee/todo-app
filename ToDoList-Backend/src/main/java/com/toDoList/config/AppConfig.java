@@ -28,19 +28,18 @@ public class AppConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		   
-		  http.sessionManagement(
-				  management->management.sessionCreationPolicy(
-						 SessionCreationPolicy.STATELESS
-						 )
-				  ).authorizeHttpRequests(Authorize ->
+		  http.sessionManagement(management ->
+						  management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				  )
+				  .authorizeHttpRequests(Authorize ->
 						  Authorize.requestMatchers("/images/**").permitAll()
-								  .requestMatchers("/api/**").authenticated().anyRequest().permitAll()
-				  ).addFilterBefore(new JwtTokenValidator() , BasicAuthenticationFilter.class)
+								  .requestMatchers("/api/**").authenticated()
+								  .anyRequest().permitAll()
+				  )
+				  .addFilterBefore(new JwtTokenValidator() , BasicAuthenticationFilter.class)
 		                        .csrf(csrf->csrf.disable())
 		                        .cors(cors->cors.configurationSource(corsConfigurationSource()))
-		                        
 		                        .httpBasic(httpBasic -> httpBasic.disable())
-		                        
 		                        .formLogin(form -> form.disable());
 		  
 		  return http.build();
