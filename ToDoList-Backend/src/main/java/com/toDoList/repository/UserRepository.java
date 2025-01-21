@@ -10,8 +10,6 @@ import com.toDoList.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-
 	User findByEmail(String username);
-
-
+	boolean existsByEmail(String email);
 }

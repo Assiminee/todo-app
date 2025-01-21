@@ -71,10 +71,7 @@ public class AuthController {
 	) throws Exception
 	{
 		try {
-
-			User isEmailExist = userRepository.findByEmail(email);
-
-			if(isEmailExist != null)
+			if(userRepository.existsByEmail(email))
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 
 			//create new User
@@ -108,8 +105,8 @@ public class AuthController {
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	
@@ -139,11 +136,8 @@ public class AuthController {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
-	    	
-	    	
 	    }
 	    
 	 
