@@ -1,8 +1,12 @@
 package com.toDoList.controller;
 
-import java.sql.Date;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
+import com.toDoList.model.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,23 +63,39 @@ public class UserController {
 	
 	
 	@GetMapping("/profile")
-	public ResponseEntity<User> getUserProfile (@RequestHeader("Authorization") String jwt){
+	public ResponseEntity<UserDTO> getUserProfile (@RequestHeader("Authorization") String jwt){
 
 		User user = userService.getProfile(jwt);
-		
-		return new ResponseEntity<>(user , HttpStatus.OK);
+
+		UserDTO userDTO = new UserDTO();
+
+		userDTO.setId(user.getId());
+		userDTO.setUserName(user.getUserName());
+		userDTO.setEmail(user.getEmail());
+		userDTO.setProfilePicture(user.getProfilePicture());
+		userDTO.setGender(user.getGender());
+		userDTO.setBirthDate(user.getBirthDate());
+
+		return new ResponseEntity<>(userDTO , HttpStatus.OK);
 	}
 
-
-
-	@GetMapping
+	/*@GetMapping
 	public ResponseEntity<List<User>> getUsers (@RequestHeader("Authorization") String jwt){
 
 		List<User> users = userService.getAllUsers();
 
 		return new ResponseEntity<>(users , HttpStatus.OK);
+	}*/
+
+	@GetMapping
+	public ResponseEntity<List<User>> searchUsers(
+			@RequestHeader("Authorization") String jwt,
+			@RequestParam(required = false) String keyword) {
+
+		List<User> users = userService.searchUsers(keyword);
+
+		return new ResponseEntity<>(users , HttpStatus.OK);
 	}
-	
 	
 	
 	@PutMapping

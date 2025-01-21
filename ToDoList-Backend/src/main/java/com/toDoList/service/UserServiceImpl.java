@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,10 @@ public class UserServiceImpl implements UserService {
 	public List<User> getAllUsers() {
 
 		return userRepository.findAll();
+	}
+
+	public List<User> searchUsers(String keyword) {
+		return userRepository.searchUsers(keyword == null || keyword.isBlank() ? null : keyword);
 	}
 
 	
@@ -76,6 +81,11 @@ public class UserServiceImpl implements UserService {
 		
 		userRepository.delete(user);
 		
+	}
+
+	@Override
+	public User getUserById(UUID userId) {
+		return userRepository.findById(userId).orElse(null);
 	}
 
 

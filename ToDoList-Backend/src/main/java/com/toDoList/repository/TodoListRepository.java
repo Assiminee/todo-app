@@ -30,6 +30,16 @@ public interface TodoListRepository extends JpaRepository<TodoList, UUID> {
 			@Param("role") String role
 	);
 
+	@Query("""
+       SELECT CASE WHEN COUNT(t) > 0 THEN TRUE ELSE FALSE END
+       FROM TodoList t
+       WHERE t.id = :todoListId AND t.owner.id = :userId
+       """)
+	boolean isOwner(@Param("todoListId") UUID todoListId, @Param("userId") UUID userId);
+
+
+
+
 
 
 
