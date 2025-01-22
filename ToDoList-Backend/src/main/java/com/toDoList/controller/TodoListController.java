@@ -3,9 +3,11 @@ package com.toDoList.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.toDoList.model.User;
 import com.toDoList.model.dto.AddMemberRequest;
 import com.toDoList.model.dto.ListTodoListDTO;
 import com.toDoList.model.dto.TodoListDTO;
+import com.toDoList.model.dto.UpdateTodoListRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,16 +55,49 @@ public class TodoListController {
         return ResponseEntity.ok(todoLists);
     }
 
-    @PostMapping("/{todoListId}/addMembers")
-    public ResponseEntity<?> addMembersToTodoList(
+    @GetMapping("/{todoListId}")
+    public ResponseEntity<TodoList> getTodoListById(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId)
+    {
+         TodoList todoList = todoListService.getTodoListById(todoListId);
+        return new ResponseEntity<>(todoList,HttpStatus.OK);
+    }
+
+    @PutMapping("/{todoListId}")
+    public ResponseEntity<?> addMembersToTodoListAndModify(
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId,
-            @RequestBody List<AddMemberRequest> membersToAdd
+            @RequestBody UpdateTodoListRequest updateRequest
     ) {
+        try {
 
-        todoListService.addMembersToTodoList(jwt, todoListId, membersToAdd);
+            todoListService.addMembersToTodoListAndModify(jwt, todoListId, updateRequest);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{todoListId}")
+    public ResponseEntity<Void> deleteLoggedInUser (
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId)
+    {
+
+        try {
+
+            todoListService.deleteTodoList(jwt, todoListId);
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
     }
 
 }

@@ -15,6 +15,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 	User findByEmail(String username);
 
+	boolean existsByEmail(String email);
+
 	@Query("""
        SELECT u FROM User u
        WHERE (:keyword IS NULL OR u.userName LIKE CONCAT('%', :keyword, '%') OR u.email LIKE CONCAT('%', :keyword, '%'))
@@ -22,5 +24,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	List<User> searchUsers(@Param("keyword") String keyword);
 
 
-	boolean existsByEmail(String email);
+
 }

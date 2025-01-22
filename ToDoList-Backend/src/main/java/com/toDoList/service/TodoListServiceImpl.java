@@ -8,6 +8,7 @@ import com.toDoList.model.*;
 import com.toDoList.model.dto.AddMemberRequest;
 import com.toDoList.model.dto.ListTodoListDTO;
 import com.toDoList.model.dto.TodoListDTO;
+import com.toDoList.model.dto.UpdateTodoListRequest;
 import com.toDoList.model.enums.Category;
 import com.toDoList.model.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,12 @@ public class TodoListServiceImpl implements TodoListService {
 
 	}
 
-	public void addMembersToTodoList(String jwt, UUID todoListId, List<AddMemberRequest> membersToAdd) {
+	@Override
+	public TodoList getTodoListById(UUID id) {
+		return todoListRepository.findById(id).orElse(null);
+	}
+
+	public void addMembersToTodoListAndModify(String jwt, UUID todoListId, UpdateTodoListRequest updateRequest) throws IllegalArgumentException {
 
 
 		User loggedInUser = userService.getProfile(jwt);
@@ -91,23 +97,53 @@ public class TodoListServiceImpl implements TodoListService {
 		TodoList todoList = todoListRepository.findById(todoListId)
 				.orElseThrow(() -> new IllegalArgumentException("TodoList not found"));
 
-
-		for (AddMemberRequest request : membersToAdd) {
-			// Fetch the user to be added
-			User userToAdd = userService.getUserById(request.getUserId());
-
-			// Check if user is already a member of the list
-			if (memberRepository.existsByListAndUser(todoList, userToAdd)) {
-				continue; // Skip if the user is already a member
-			}
-
-			// Create and save the new Member
-			Member newMember = new Member();
-			newMember.setUser(userToAdd);
-			newMember.setList(todoList);
-			newMember.setRole(Role.MEMBER.name());
-
-			memberRepository.save(newMember);
+		if (updateRequest.getTitle() != null) {
+			todoList.setTitle(updateRequest.getTitle());
 		}
+
+		if (updateRequest.getDescription() != null) {
+			todoList.setDescription(updateRequest.getDescription());
+		}
+
+		if (updateRequest.getCategory() != null) {
+			todoList.setCategory(Category.valueOf(updateRequest.getCategory()).name());
+		}
+
+		if (updateRequest.getMembersToAdd() != null && !updateRequest.getMembersToAdd().isEmpty()) {
+			for (AddMemberRequest memberRequest : updateRequest.getMembersToAdd()) {
+				// Fetch the user to be added
+				User userToAdd = userService.getUserById(memberRequest.getUserId());
+
+
+				// Check if user is already a member of the list
+				if (memberRepository.existsByListAndUser(todoList, userToAdd)) {
+					continue; // Skip if the user is already a member
+				}
+
+				// Create and save the new Member
+				Member newMember = new Member();
+				newMember.setUser(userToAdd);
+				newMember.setList(todoList);
+				newMember.setRole(Role.MEMBER.name());
+
+				memberRepository.save(newMember);
+			}
+		}
+
+		// Save changes to the TodoList
+		todoListRepository.save(todoList);
+	}
+
+	@Override
+	public void deleteTodoList(String jwt, UUID todoListId) throws Exception {
+
+		User loggedInUser = userService.getProfile(jwt);
+
+		// Verify ownership
+		if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
+			throw new Exception("You are not authorized delete this TodoList.");
+		}
+
+		todoListRepository.deleteById(todoListId);
 	}
 }

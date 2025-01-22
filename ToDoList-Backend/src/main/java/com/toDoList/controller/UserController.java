@@ -67,6 +67,7 @@ public class UserController {
 
 		User user = userService.getProfile(jwt);
 
+
 		UserDTO userDTO = new UserDTO();
 
 		userDTO.setId(user.getId());
