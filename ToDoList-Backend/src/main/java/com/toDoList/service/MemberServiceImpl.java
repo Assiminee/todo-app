@@ -43,7 +43,7 @@ public class MemberServiceImpl implements MemberService {
         if (member.getUser().getId() == loggedInUser.getId()) {
             throw new Exception("You are owner of this list. you cant delete this member.");
         }
-        
+
         memberRepository.deleteById(memberId);
 
     }
