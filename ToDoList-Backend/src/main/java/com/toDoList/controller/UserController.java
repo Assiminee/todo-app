@@ -62,21 +62,24 @@ public class UserController {
 	
 	
 	@GetMapping("/profile")
-	public ResponseEntity<UserDTO> getUserProfile (@RequestHeader("Authorization") String jwt){
+	public ResponseEntity<?> getUserProfile (@RequestHeader("Authorization") String jwt){
+		try {
+			User user = userService.getProfile(jwt);
 
-		User user = userService.getProfile(jwt);
+			UserDTO userDTO = new UserDTO();
 
+			userDTO.setId(user.getId());
+			userDTO.setUserName(user.getUserName());
+			userDTO.setEmail(user.getEmail());
+			userDTO.setProfilePicture(user.getProfilePicture());
+			userDTO.setGender(user.getGender());
+			userDTO.setBirthDate(user.getBirthDate());
 
-		UserDTO userDTO = new UserDTO();
-
-		userDTO.setId(user.getId());
-		userDTO.setUserName(user.getUserName());
-		userDTO.setEmail(user.getEmail());
-		userDTO.setProfilePicture(user.getProfilePicture());
-		userDTO.setGender(user.getGender());
-		userDTO.setBirthDate(user.getBirthDate());
-
-		return new ResponseEntity<>(userDTO , HttpStatus.OK);
+			return new ResponseEntity<>(userDTO, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 	}
 
 	/*@GetMapping
