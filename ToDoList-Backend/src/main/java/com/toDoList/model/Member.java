@@ -28,7 +28,7 @@ public class Member {
 	    private UUID id;
 
 	    @CreationTimestamp
-	    private LocalDateTime addedAt = LocalDateTime.now();
+	    private LocalDateTime addedAt ;
 	    private String role;       // Use "OWNER" for owner or "MEMBER" for member
 
 	    @ManyToOne

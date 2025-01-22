@@ -1,9 +1,8 @@
 package com.toDoList.controller;
 
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
+
+import java.sql.Date;
 import java.util.List;
 
 import com.toDoList.model.dto.UserDTO;
@@ -100,7 +99,7 @@ public class UserController {
 	
 	
 	@PutMapping
-	public ResponseEntity<User> updateLoggedInUser (@RequestHeader("Authorization") String jwt, 
+	public ResponseEntity<?> updateLoggedInUser (@RequestHeader("Authorization") String jwt,
 			  @RequestParam("userName") String fullName
 			, @RequestParam("email") String email
 			, @RequestParam("password") String password
@@ -111,14 +110,15 @@ public class UserController {
 	
 		try {
 
+			User loggedUser = userService.getProfile(jwt);
 
-			User isEmailExist = userRepository.findByEmail(email);
+			boolean isEmailExist = userRepository.existsByIdIsNotAndEmail(loggedUser.getId(),email);
 
-			if (isEmailExist != null) {
+			if (isEmailExist) {
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 
-			User loggedUser = userService.getProfile(jwt);
+
 
 			User updatedUser = new User();
 
@@ -136,8 +136,10 @@ public class UserController {
 
 			User user = userService.updateUser(loggedUser, updatedUser, profilePicture);
 
+			UserDTO userDTO = new UserDTO(user.getId(),fullName,email,profilePicture.getOriginalFilename()
+					,Gender.valueOf(gender),birthDate);
 
-			return new ResponseEntity<>(user, HttpStatus.OK);
+			return new ResponseEntity<>(userDTO, HttpStatus.OK);
 
 		} catch (Exception e) {
 			e.getStackTrace();

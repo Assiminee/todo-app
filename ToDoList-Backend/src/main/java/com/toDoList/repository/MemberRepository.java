@@ -17,4 +17,5 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     boolean existsByListAndUser(TodoList todoList, User user);
 
+    Member findMemberById(UUID id);
 }

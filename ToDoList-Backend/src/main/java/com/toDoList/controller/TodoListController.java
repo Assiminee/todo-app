@@ -8,6 +8,7 @@ import com.toDoList.model.dto.AddMemberRequest;
 import com.toDoList.model.dto.ListTodoListDTO;
 import com.toDoList.model.dto.TodoListDTO;
 import com.toDoList.model.dto.UpdateTodoListRequest;
+import com.toDoList.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,20 +24,22 @@ public class TodoListController {
 	
 	private final TodoListService todoListService;
 
-	@Autowired
-	public TodoListController(TodoListService todoListService) {
+    private final MemberService memberService;
+
+    @Autowired
+    public TodoListController(TodoListService todoListService, MemberService memberService) {
         this.todoListService = todoListService;
-	}
-	
-	
-	@PostMapping
-	public ResponseEntity<TodoList> createTodoList(
+        this.memberService = memberService;
+    }
+
+    @PostMapping
+	public ResponseEntity<?> createTodoList(
             @RequestHeader("Authorization") String jwt,
             @RequestBody TodoListDTO todoListDTO
             ) {
 
         try {
-            TodoList todoList = todoListService.createTodoList(jwt, todoListDTO);
+            ListTodoListDTO todoList = todoListService.createTodoList(jwt, todoListDTO);
             return new ResponseEntity<>(todoList , HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -81,7 +84,7 @@ public class TodoListController {
     }
 
     @DeleteMapping("/{todoListId}")
-    public ResponseEntity<Void> deleteLoggedInUser (
+    public ResponseEntity<Void> deleteTodoList (
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId)
     {
@@ -92,6 +95,24 @@ public class TodoListController {
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
+        } catch (Exception e) {
+            e.getStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @DeleteMapping("/{todoListId}/members/{memberId}")
+    public ResponseEntity<Void> deleteMember (
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId,
+            @PathVariable UUID memberId)
+    {
+        try {
+            memberService.deleteMember(jwt, todoListId,memberId);
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             e.getStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

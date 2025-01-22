@@ -36,7 +36,7 @@ public class TodoListServiceImpl implements TodoListService {
 	}
 
 	@Override
-	public TodoList createTodoList(String jwt, TodoListDTO todoListDTO) throws Exception {
+	public ListTodoListDTO createTodoList(String jwt, TodoListDTO todoListDTO) throws Exception {
 		
 		User loggedInUser = userService.getProfile(jwt);
 
@@ -51,7 +51,9 @@ public class TodoListServiceImpl implements TodoListService {
 
 		// Save the TodoList (Cascade will save Members too)
 		todoList.setMembers(List.of(ownerMember));
-		return todoListRepository.save(todoList);
+		todoListRepository.save(todoList);
+
+		return new ListTodoListDTO (todoList);
 	}
 
 
@@ -73,6 +75,7 @@ public class TodoListServiceImpl implements TodoListService {
 
 			listTodoListDTOS.add(new ListTodoListDTO(list));
 
+
 		}
 
 		return listTodoListDTOS;
@@ -81,7 +84,16 @@ public class TodoListServiceImpl implements TodoListService {
 
 	@Override
 	public TodoList getTodoListById(UUID id) {
-		return todoListRepository.findById(id).orElse(null);
+
+		TodoList todoList = todoListRepository.findById(id).orElse(null);
+
+        if (todoList != null) {
+            todoList.getOwner().setPassword("NONE OF YOUR BUSINESS");
+			for (Member member : todoList.getMembers()){
+				member.getUser().setPassword("NONE OF YOUR BUSINESS");
+			}
+        }
+        return todoList;
 	}
 
 	public void addMembersToTodoListAndModify(String jwt, UUID todoListId, UpdateTodoListRequest updateRequest) throws IllegalArgumentException {
@@ -125,6 +137,7 @@ public class TodoListServiceImpl implements TodoListService {
 				newMember.setUser(userToAdd);
 				newMember.setList(todoList);
 				newMember.setRole(Role.MEMBER.name());
+
 
 				memberRepository.save(newMember);
 			}

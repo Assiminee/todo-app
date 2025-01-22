@@ -13,7 +13,7 @@ import com.toDoList.model.TodoList;
 @Service
 public interface TodoListService {
 	
-	public TodoList createTodoList(String jwt, TodoListDTO todoListDTO) throws Exception;
+	public ListTodoListDTO createTodoList(String jwt, TodoListDTO todoListDTO) throws Exception;
 
     public List<ListTodoListDTO> getFilteredTodoLists(String jwt, String title, String category, String role);
 

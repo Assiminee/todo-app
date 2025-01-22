@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	User findByEmail(String username);
 
 	boolean existsByEmail(String email);
+	boolean existsByIdIsNotAndEmail(UUID id, String email);
 
 	@Query("""
        SELECT u FROM User u
