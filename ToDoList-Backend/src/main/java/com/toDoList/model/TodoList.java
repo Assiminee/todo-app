@@ -33,6 +33,7 @@ public class TodoList {
 	private UUID id;
 
 	private String title;
+
 	private String description;
 
 	@CreationTimestamp
@@ -51,6 +52,9 @@ public class TodoList {
 	// One TodoList has many members
 	@OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Member> members;
+
+	@OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Task> tasks;
 
 	public TodoList(String title, String description, String category, User owner) {
 		this.title = title;

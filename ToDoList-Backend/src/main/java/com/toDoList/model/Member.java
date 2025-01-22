@@ -2,15 +2,12 @@ package com.toDoList.model;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +24,7 @@ import org.hibernate.annotations.CreationTimestamp;
 public class Member {
 	
 	 @Id
-	    @GeneratedValue
+	    @GeneratedValue(strategy = GenerationType.UUID)
 	    private UUID id;
 
 	    @CreationTimestamp
@@ -43,7 +40,10 @@ public class Member {
 	    @JoinColumn(name = "user_id", nullable = false)
 	    private User user;
 
-	    public Member(TodoList list, User user ,String role) {
+	@OneToMany(mappedBy = "assignedMember", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Task> assignedTasks; // to be debated
+
+	public Member(TodoList list, User user ,String role) {
 	        this.list = list;
 	        this.user = user;
 	        this.role = role;
