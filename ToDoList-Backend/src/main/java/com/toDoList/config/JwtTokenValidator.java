@@ -33,7 +33,6 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 		
 
 		String jwt = request.getHeader(JwtConstant.JWT_HEADER);
-
 		
 		if(jwt != null) {
 			
