@@ -39,6 +39,7 @@ public class TodoListController {
             TodoList todoList = todoListService.createTodoList(jwt, todoListDTO);
             return new ResponseEntity<>(todoList , HttpStatus.CREATED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 	}
