@@ -146,11 +146,6 @@ public class TodoListController {
 
         try {
 
-//            TodoList todoList = todoListService.getTodoListById(todoListId);
-//
-//            if(!taskRepository.existsByTodoListAndTitle(todoList,request.getTitle()))
-//                return new ResponseEntity<>(HttpStatus.CONFLICT);
-
             Task  task = taskService.createTask(
                     jwt,
                     todoListId,

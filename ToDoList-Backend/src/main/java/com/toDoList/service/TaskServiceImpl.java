@@ -26,16 +26,19 @@ public class TaskServiceImpl implements TaskService {
     private final MemberRepository memberRepository;
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final EmailService emailService;
 
     @Autowired
     public TaskServiceImpl(TodoListRepository todoListRepository,
                            MemberRepository memberRepository,
                            TaskRepository taskRepository,
-                           UserService userService) {
+                           UserService userService,
+                           EmailService emailService) {
         this.todoListRepository = todoListRepository;
         this.memberRepository = memberRepository;
         this.taskRepository = taskRepository;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -77,8 +80,25 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.save(task);
         assignedMember.getUser().setPassword("NONE OF YOUR BUSINESS");
 
+        // Notify the assigned member via email
+        String recipientEmail = assignedMember.getUser().getEmail();
+        String subject = "New Task Assigned: " + title;
+        String body = String.format(
+                "<p>Hi %s,</p>" +
+                        "<p>You have been assigned a new task:</p>" +
+                        "<ul>" +
+                        "<li><strong>Title:</strong> %s</li>" +
+                        "<li><strong>Description:</strong> %s</li>" +
+                        "<li><strong>Deadline:</strong> %s</li>" +
+                        "</ul>" +
+                        "<p>Best Regards,<br>TodoList Team</p>",
+                assignedMember.getUser().getUserName(), title, description, deadline);
+
+// Use true for HTML content
+        emailService.sendEmail(recipientEmail, subject, body);
+
         return task;
-       // return new TaskResponse(task,todoList.getTitle());
+
     }
 
     @Override
