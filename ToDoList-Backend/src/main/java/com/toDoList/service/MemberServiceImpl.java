@@ -41,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findMemberById(memberId);
 
         if (member.getUser().getId() == loggedInUser.getId()) {
-            throw new Exception("You are owner of this list. you cant delete this member.");
+            throw new Exception("You are owner of this list. you cant delete yourself.");
         }
 
         memberRepository.deleteById(memberId);

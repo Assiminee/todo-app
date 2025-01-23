@@ -157,6 +157,10 @@ public class TodoListServiceImpl implements TodoListService {
 			throw new Exception("You are not authorized delete this TodoList.");
 		}
 
+		TodoList todoList = todoListRepository.findById(todoListId)
+				.orElseThrow(() -> new IllegalArgumentException("TodoList not found"));
+
 		todoListRepository.deleteById(todoListId);
 	}
+
 }

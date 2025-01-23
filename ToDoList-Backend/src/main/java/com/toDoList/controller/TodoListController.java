@@ -3,12 +3,14 @@ package com.toDoList.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.toDoList.model.Task;
 import com.toDoList.model.User;
-import com.toDoList.model.dto.AddMemberRequest;
-import com.toDoList.model.dto.ListTodoListDTO;
-import com.toDoList.model.dto.TodoListDTO;
-import com.toDoList.model.dto.UpdateTodoListRequest;
+import com.toDoList.model.dto.*;
+import com.toDoList.model.enums.Gender;
+import com.toDoList.model.enums.Status;
+import com.toDoList.repository.TaskRepository;
 import com.toDoList.service.MemberService;
+import com.toDoList.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +28,17 @@ public class TodoListController {
 
     private final MemberService memberService;
 
+    private final TaskService taskService;
+
+    private final TaskRepository taskRepository;
+
     @Autowired
-    public TodoListController(TodoListService todoListService, MemberService memberService) {
+    public TodoListController(TodoListService todoListService, MemberService memberService,
+                              TaskService taskService, TaskRepository taskRepository) {
         this.todoListService = todoListService;
         this.memberService = memberService;
+        this.taskService = taskService;
+        this.taskRepository = taskRepository;
     }
 
     @PostMapping
@@ -80,6 +89,7 @@ public class TodoListController {
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -89,15 +99,13 @@ public class TodoListController {
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId)
     {
-
         try {
 
             todoListService.deleteTodoList(jwt, todoListId);
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
         } catch (Exception e) {
-            e.getStackTrace();
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -115,11 +123,40 @@ public class TodoListController {
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            e.getStackTrace();
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 
+    }
+
+    @PostMapping("/{todoListId}/tasks")
+    public ResponseEntity<TaskResponse> createTask(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId,
+            @RequestBody TaskRequest request) {
+
+        try {
+
+//            TodoList todoList = todoListService.getTodoListById(todoListId);
+//
+//            if(!taskRepository.existsByTodoListAndTitle(todoList,request.getTitle()))
+//                return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+            TaskResponse  task = taskService.createTask(
+                    jwt,
+                    todoListId,
+                    request.getTitle(),
+                    request.getDescription(),
+                    request.getDeadline(),
+                    request.getPriority(),
+                    request.getAssignedMemberId() // Optional
+            );
+            return new ResponseEntity<>(task , HttpStatus.CREATED);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

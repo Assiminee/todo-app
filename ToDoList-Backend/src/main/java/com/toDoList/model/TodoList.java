@@ -49,7 +49,6 @@ public class TodoList {
 	@JoinColumn(name = "owner_id", nullable = false)
 	private User owner;
 
-	// One TodoList has many members
 	@OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Member> members;
 

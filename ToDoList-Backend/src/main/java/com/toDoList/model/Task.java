@@ -1,5 +1,6 @@
 package com.toDoList.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.toDoList.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,7 +34,6 @@ public class Task {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
@@ -44,6 +44,7 @@ public class Task {
     private int priority; // 0 (lowest) to 5 (highest)
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "todo_list_id", nullable = false)
     private TodoList todoList;
 
@@ -52,11 +53,12 @@ public class Task {
     private Member assignedMember;
 
 
-    public Task(String title, String description, LocalDateTime deadline, Status status, int priority) {
+    public Task(String title, String description, LocalDateTime deadline, Status status, int priority, Member assignedMember) {
         this.title = title;
         this.description = description;
         this.deadline = deadline;
         this.status = status;
         this.priority = priority;
+        this.assignedMember = assignedMember;
     }
 }
