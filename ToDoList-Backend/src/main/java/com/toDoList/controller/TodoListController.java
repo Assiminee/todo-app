@@ -167,6 +167,24 @@ public class TodoListController {
         }
     }
 
+    @PutMapping("/{todoListId}/tasks/{taskId}")
+    public ResponseEntity<?> completeTaskAndModify(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId,
+            @PathVariable UUID taskId,
+            @RequestBody TaskUpdate taskUpdate
+    ) {
+        try {
+
+            taskService.updateTaskAndChangeStatus(jwt,todoListId,taskId,taskUpdate);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping("/{todoListId}/tasks/{taskId}")
     public ResponseEntity<Void> deleteTask (
             @RequestHeader("Authorization") String jwt,

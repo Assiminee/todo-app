@@ -17,13 +17,18 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
+
+    private final TaskService taskService;
+
     @Autowired
-    private TaskService taskService;
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Task>> getTasksByDeadline(
             @RequestHeader("Authorization") String jwt,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadline) {
+            @RequestParam("deadline") LocalDate deadline) {
 
         try {
             List<Task> tasks = taskService.getTasksByDeadline(jwt, deadline);

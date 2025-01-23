@@ -103,7 +103,7 @@ public class TodoListServiceImpl implements TodoListService {
 
 		// Verify ownership
 		if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
-			throw new IllegalArgumentException("You are not authorized to add members to this TodoList.");
+			throw new IllegalArgumentException("You are not authorized to modify this TodoList.");
 		}
 
 		TodoList todoList = todoListRepository.findById(todoListId)

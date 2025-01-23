@@ -16,9 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class TaskResponse {
-
-    private UUID id;
+public class TaskUpdate {
 
     private String title;
 
@@ -28,18 +26,16 @@ public class TaskResponse {
 
     private int priority;
 
-    private String assignedMember;
+    private String status;
 
-    private String todoListTitle;
-
-    public TaskResponse( Task task ,String todoListTitle ) {
-        this.id = task.getId();
+    public TaskUpdate( Task task, String status  ) {
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.deadline = task.getDeadline();
         this.priority = task.getPriority();
-        this.assignedMember = task.getAssignedMember().getUser().getEmail();
-        this.todoListTitle = todoListTitle;
+        this.status = status;
+
+
 
 
     }

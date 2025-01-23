@@ -49,7 +49,7 @@ public class Task {
     @JoinColumn(name = "todo_list_id", nullable = false)
     private TodoList todoList;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "assigned_member_id") // if a member is not assigned then it will default to the owner of the task
     private Member assignedMember;
 

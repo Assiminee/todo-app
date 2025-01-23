@@ -5,6 +5,8 @@ import com.toDoList.model.Member;
 import com.toDoList.model.Task;
 import com.toDoList.model.TodoList;
 import com.toDoList.model.User;
+import com.toDoList.model.dto.TaskUpdate;
+import com.toDoList.model.enums.Category;
 import com.toDoList.model.enums.Status;
 import com.toDoList.repository.MemberRepository;
 import com.toDoList.repository.TaskRepository;
@@ -89,10 +91,44 @@ public class TaskServiceImpl implements TaskService {
         User loggedInUser = userService.getProfile(jwt);
 
         List<Task> tasks = taskRepository.findTasksByUserAndExactDeadline(loggedInUser.getId(), deadline);
-        if (tasks.isEmpty()) {
+        if (tasks.isEmpty())
             throw new Exception("you have no Tasks assigned to you.");
+
+        for(Task task : tasks) {
+            task.getAssignedMember().getUser().setPassword("NONE OF YOUR BUSINESS");
         }
         return tasks ;
+    }
+
+    @Override
+    public void updateTaskAndChangeStatus(String jwt, UUID todoListId, UUID taskId, TaskUpdate updateTask) throws Exception {
+
+        User loggedInUser = userService.getProfile(jwt);
+
+        // Verify ownership
+        if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
+            throw new Exception("You are not authorized to modify tasks in this todolist.");
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        if (updateTask.getTitle() != null) {
+            task.setTitle(updateTask.getTitle());
+        }
+
+        if (updateTask.getDescription() != null) {
+            task.setDescription(updateTask.getDescription());
+        }
+
+        if (updateTask.getDeadline() != null) {
+            task.setDeadline(updateTask.getDeadline());
+        }
+        if (updateTask.getStatus() != null) {
+            task.setStatus(Status.valueOf(updateTask.getStatus()));
+        }
+
+        taskRepository.save(task);
     }
 
     @Override
