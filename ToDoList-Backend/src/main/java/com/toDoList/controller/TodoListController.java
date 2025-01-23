@@ -64,6 +64,7 @@ public class TodoListController {
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId)
     {
+
          TodoList todoList = todoListService.getTodoListById(todoListId);
         return new ResponseEntity<>(todoList,HttpStatus.OK);
     }
