@@ -5,7 +5,6 @@ import com.toDoList.model.Member;
 import com.toDoList.model.Task;
 import com.toDoList.model.TodoList;
 import com.toDoList.model.User;
-import com.toDoList.model.dto.TaskResponse;
 import com.toDoList.model.enums.Status;
 import com.toDoList.repository.MemberRepository;
 import com.toDoList.repository.TaskRepository;
@@ -13,7 +12,9 @@ import com.toDoList.repository.TodoListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,8 +37,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse createTask(String jwt, UUID todoListId, String title, String description,
-                                   LocalDateTime deadline, int priority, UUID assignedMemberId) throws Exception {
+    public Task createTask(String jwt, UUID todoListId, String title, String description,
+                           LocalDate deadline, int priority, UUID assignedMemberId) throws Exception {
 
         User loggedInUser = userService.getProfile(jwt);
 
@@ -66,17 +67,45 @@ public class TaskServiceImpl implements TaskService {
                     .orElseThrow(() -> new IllegalStateException("Owner not found in TodoList members"));
         }
 
+
         // Create and save the task
         Task task = new Task(title, description, deadline, Status.PENDING, priority, assignedMember);
         task.setTodoList(todoList);
 
         taskRepository.save(task);
+        assignedMember.getUser().setPassword("NONE OF YOUR BUSINESS");
 
-        return new TaskResponse(task);
+        return task;
+       // return new TaskResponse(task,todoList.getTitle());
     }
 
     @Override
     public Task getTaskById(UUID taskId) throws Exception {
         return null;
+    }
+
+    public List<Task> getTasksByDeadline(String jwt, LocalDate deadline) throws Exception {
+
+        User loggedInUser = userService.getProfile(jwt);
+
+        List<Task> tasks = taskRepository.findTasksByUserAndExactDeadline(loggedInUser.getId(), deadline);
+        if (tasks.isEmpty()) {
+            throw new Exception("you have no Tasks assigned to you.");
+        }
+        return tasks ;
+    }
+
+    @Override
+    public void deleteTask(String jwt, UUID todoListId,  UUID taskId) throws Exception {
+
+        User loggedInUser = userService.getProfile(jwt);
+
+        // Verify ownership
+        if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
+            throw new Exception("You are not authorized to delete tasks in this todolist.");
+        }
+
+        taskRepository.deleteById(taskId);
+
     }
 }

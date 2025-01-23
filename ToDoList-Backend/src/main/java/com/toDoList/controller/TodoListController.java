@@ -73,8 +73,16 @@ public class TodoListController {
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId)
     {
-         TodoList todoList = todoListService.getTodoListById(todoListId);
-        return new ResponseEntity<>(todoList,HttpStatus.OK);
+        try {
+
+            TodoList todoList = todoListService.getTodoListById(todoListId);
+            if (todoList == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(todoList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{todoListId}")
@@ -131,7 +139,7 @@ public class TodoListController {
     }
 
     @PostMapping("/{todoListId}/tasks")
-    public ResponseEntity<TaskResponse> createTask(
+    public ResponseEntity<Task> createTask(
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId,
             @RequestBody TaskRequest request) {
@@ -143,7 +151,7 @@ public class TodoListController {
 //            if(!taskRepository.existsByTodoListAndTitle(todoList,request.getTitle()))
 //                return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-            TaskResponse  task = taskService.createTask(
+            Task  task = taskService.createTask(
                     jwt,
                     todoListId,
                     request.getTitle(),
@@ -157,6 +165,24 @@ public class TodoListController {
             System.out.println(e.getMessage());
            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @DeleteMapping("/{todoListId}/tasks/{taskId}")
+    public ResponseEntity<Void> deleteTask (
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable UUID todoListId,
+            @PathVariable UUID taskId)
+    {
+        try {
+            taskService.deleteTask(jwt,todoListId,taskId);
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
     }
 
 }

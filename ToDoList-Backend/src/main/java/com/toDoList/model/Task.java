@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class Task {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    private LocalDateTime deadline;
+    private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,7 +54,7 @@ public class Task {
     private Member assignedMember;
 
 
-    public Task(String title, String description, LocalDateTime deadline, Status status, int priority, Member assignedMember) {
+    public Task(String title, String description, LocalDate deadline, Status status, int priority, Member assignedMember) {
         this.title = title;
         this.description = description;
         this.deadline = deadline;

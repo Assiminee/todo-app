@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -19,7 +19,7 @@ public class TaskRequest {
 
     private String description;
 
-    private LocalDateTime deadline;
+    private LocalDate deadline; // Optional
 
     private int priority;
 

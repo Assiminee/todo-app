@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,18 +22,25 @@ public class TaskResponse {
 
     private String title;
 
-    private LocalDateTime deadline;
+    private String description;
+
+    private LocalDate deadline;
 
     private int priority;
 
     private String assignedMember;
 
-    public TaskResponse( Task task ) {
+    private String todoListTitle;
+
+    public TaskResponse( Task task ,String todoListTitle ) {
         this.id = task.getId();
         this.title = task.getTitle();
+        this.description = task.getDescription();
         this.deadline = task.getDeadline();
         this.priority = task.getPriority();
         this.assignedMember = task.getAssignedMember().getUser().getEmail();
+        this.todoListTitle = todoListTitle;
+
 
     }
 }
