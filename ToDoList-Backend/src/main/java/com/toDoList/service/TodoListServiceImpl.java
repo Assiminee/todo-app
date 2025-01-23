@@ -154,9 +154,13 @@ public class TodoListServiceImpl implements TodoListService {
 
 		// Verify ownership
 		if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
-			throw new Exception("You are not authorized delete this TodoList.");
+			throw new Exception("You are not authorized to delete this TodoList.");
 		}
+
+		TodoList todoList = todoListRepository.findById(todoListId)
+				.orElseThrow(() -> new IllegalArgumentException("TodoList not found"));
 
 		todoListRepository.deleteById(todoListId);
 	}
+
 }

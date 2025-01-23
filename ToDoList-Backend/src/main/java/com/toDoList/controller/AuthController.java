@@ -135,7 +135,7 @@ public class AuthController {
 				return new ResponseEntity<>(authResponse , HttpStatus.OK);
 				
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println(e.getMessage());
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
 	    }

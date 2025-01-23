@@ -41,6 +41,7 @@ public class Member {
 	    private User user;
 
 	@OneToMany(mappedBy = "assignedMember", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Task> assignedTasks; // to be debated
 
 	public Member(TodoList list, User user ,String role) {
