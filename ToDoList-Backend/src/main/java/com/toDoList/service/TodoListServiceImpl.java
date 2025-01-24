@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.toDoList.exceptions.ResourceNotFoundException;
+import com.toDoList.exceptions.UnauthorizedException;
 import com.toDoList.model.*;
 import com.toDoList.model.dto.AddMemberRequest;
 import com.toDoList.model.dto.ListTodoListDTO;
@@ -148,18 +150,19 @@ public class TodoListServiceImpl implements TodoListService {
 	}
 
 	@Override
-	public void deleteTodoList(String jwt, UUID todoListId) throws Exception {
+	public void deleteTodoList(String jwt, UUID todoListId)
+			throws UnauthorizedException, ResourceNotFoundException {
 
 		User loggedInUser = userService.getProfile(jwt);
 
+		TodoList todoList = todoListRepository.findById(todoListId)
+				.orElseThrow(() -> new ResourceNotFoundException("TodoList not found"));
+
 		// Verify ownership
 		if (!todoListRepository.isOwner(todoListId, loggedInUser.getId())) {
-			throw new Exception("You are not authorized to delete this TodoList.");
+			throw new UnauthorizedException("You are not authorized to delete this TodoList.");
 		}
-
-		TodoList todoList = todoListRepository.findById(todoListId)
-				.orElseThrow(() -> new IllegalArgumentException("TodoList not found"));
-
+		
 		todoListRepository.deleteById(todoListId);
 	}
 

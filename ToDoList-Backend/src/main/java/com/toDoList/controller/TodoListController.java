@@ -3,6 +3,8 @@ package com.toDoList.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.toDoList.exceptions.ResourceNotFoundException;
+import com.toDoList.exceptions.UnauthorizedException;
 import com.toDoList.model.Task;
 import com.toDoList.model.User;
 import com.toDoList.model.dto.*;
@@ -102,23 +104,20 @@ public class TodoListController {
         }
     }
 
+
+ //Testing Exception Handling
     @DeleteMapping("/{todoListId}")
     public ResponseEntity<Void> deleteTodoList (
             @RequestHeader("Authorization") String jwt,
             @PathVariable UUID todoListId)
+            throws UnauthorizedException, ResourceNotFoundException
     {
-        try {
-
             todoListService.deleteTodoList(jwt, todoListId);
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-
     }
+
+
 
     @DeleteMapping("/{todoListId}/members/{memberId}")
     public ResponseEntity<Void> deleteMember (
